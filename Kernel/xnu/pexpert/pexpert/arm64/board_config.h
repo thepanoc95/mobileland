@@ -280,4 +280,25 @@
 #define CORE_NCTRS 8 /* Placeholder; KPC is not enabled for this target */
 #endif  /* ARM64_BOARD_CONFIG_BCM2837 */
 
+#ifdef ARM64_BOARD_CONFIG_MSM8916_HARPIA
+/*
+ * Qualcomm MSM8916 (Snapdragon 410) - Motorola Harpia (Moto G4 Play)
+ * ARM64 mode - Cortex-A53 cores
+ *
+ * MSM8916 is a 64-bit capable SoC used in budget smartphones.
+ * Initial ARM64 support for bringup and development.
+ */
+#define MSM8916_HARPIA
+#define ARM_ARCH_TIMER
+#include <pexpert/arm64/MSM8916_HARPIA.h>
+#define __ARM_L2CACHE_SIZE_LOG__ 19  /* 512KB L2 cache */
+#define ARM_BOARD_WFE_TIMEOUT_NS 10000
+#define ARM_BOARD_CLASS_MSM8916_HARPIA
+#define CPU_COUNT 4
+#define CORE_NCTRS 4
+#define NO_MONITOR 1
+#define NO_ECORE 1
+#define BCM2837_BRINGUP 1
+#endif  /* ARM64_BOARD_CONFIG_MSM8916_HARPIA */
+
 #endif /* ! _PEXPERT_ARM_BOARD_CONFIG_H */

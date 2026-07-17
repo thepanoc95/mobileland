@@ -4,3 +4,5 @@ ravynOS.xcodeproj
 /build
 .DS_Store
 /.vscode
+Toolchains/
+obj/

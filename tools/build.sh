@@ -24,6 +24,17 @@ __MAKE_CONF=$PWD/tools/make.conf
 export MAKE BMAKE GMAKE
 export PREFIX __MAKE_CONF SRCROOT PLATFORM MAKESYSPATH
 
+# Fix for bmake on Linux - need to specify mk path explicitly
+if [ "x${OSNAME}" = "xLinux" ]; then
+  BMAKE_FLAGS="-m ${PWD}/share/mk"
+  MAKE_FLAGS="-m ${PWD}/share/mk"
+  export BMAKE_FLAGS MAKE_FLAGS
+  # Use full path for bmake
+  BMAKE=/usr/bin/bmake
+  MAKE=/usr/bin/bmake
+  export MAKE BMAKE
+fi
+
 PATH=${OBJTOP:-/usr/obj/ravynOS/${PLATFORM}}/tmp/obj-tools/usr/bin:${PATH}
 TERM=vt100
 export PATH TERM
@@ -41,7 +52,7 @@ base_build() {
 	done
     fi
     cd ${SRCROOT}
-    ${MAKE} -j${CORES} buildworld
+    ${MAKE} ${MAKE_FLAGS} -j${CORES} buildworld
     if [ $? -ne 0 ]; then exit $?; fi
 }
 
@@ -51,7 +62,7 @@ kernel_build() {
 	logdate "Cleaning object dir"
 	rm -rf ${OBJTOP}/Kernel/xnu
     fi
-    ${MAKE} -j${CORES} buildkernel
+    ${MAKE} ${MAKE_FLAGS} -j${CORES} buildkernel
     if [ $? -ne 0 ]; then exit $?; fi
 }
 
@@ -61,12 +72,12 @@ kext_build() {
       logdate "Cleaning object dir"
       rm -rf ${OBJTOP}/Kernel/Extensions
     fi
-    ${MAKE} -j${CORES} kext
+    ${MAKE} ${MAKE_FLAGS} -j${CORES} kext
     if [ $? -ne 0 ]; then exit $?; fi
 }
 
 kernelcache() {
-    ${MAKE} prelink
+    ${MAKE} ${MAKE_FLAGS} prelink
     if [ $? -ne 0 ]; then exit $?; fi
 }
 
@@ -83,10 +94,10 @@ system_build() {
         ln -sf ${SRCROOT}/sys/$(uname -m)/include \
 	/usr/obj/${SRCROOT}/${PLATFORM}/tmp/usr/include/machine
     fi
-    ${MAKE} -f Makefile.ravynOS prep
+    ${MAKE} ${MAKE_FLAGS} -f Makefile.ravynOS prep
     if [ $? -ne 0 ]; then exit $?; fi
     cp -fv share/mk/* /usr/share/mk/
-    ${MAKE} -f Makefile.ravynOS
+    ${MAKE} ${MAKE_FLAGS} -f Makefile.ravynOS
     if [ $? -ne 0 ]; then exit $?; fi
 }
 

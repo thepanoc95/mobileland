@@ -4,3 +4,7 @@ pexpert/arm/pe_identify_machine.c      standard
 pexpert/arm/pe_init.c                  standard
 pexpert/arm/pe_kprintf.c               standard
 pexpert/arm/pe_serial.c                standard
+
+# MSM8916 Harpia (Motorola G4 Play) Platform Expert - ARM64
+pexpert/arm/pe_msm8916_arm64.c         optional MSM8916_HARPIA
+pexpert/arm/pe_msm8xxx.c               optional MSM8XXX

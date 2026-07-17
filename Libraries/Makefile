@@ -13,7 +13,15 @@ SUBDIR = libfirehose_kernel CrashReporterClient MiscLibs objc4 dyld Libsystem \
 # Don't try to link Foundation or System
 MK_OBJC_RUNTIME = no
 
+# Check if pre-built libraries exist in SDK
+_SKIP_LLVM_BUILD != test -f ${RAVYN_SDKROOT}/usr/lib/libc++.dylib && test -f ${RAVYN_SDKROOT}/usr/lib/libclang_rt.osx.a && echo "yes" || echo "no"
+
+.if ${_SKIP_LLVM_BUILD} == "yes"
+all:
+	@echo "Using pre-built libc++ and compiler_rt from SDK"
+.else
 all: libcxx_dylib compiler_rt
+.endif
 
 # ------------------------------------------------------------------------
 #                  LLVM BUILTINS AND RUNTIME

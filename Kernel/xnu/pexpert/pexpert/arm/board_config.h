@@ -34,4 +34,21 @@
 #define PEXPERT_NO_3X_IMAGES    1
 #endif  /* ARM_BOARD_CONFIG_T8004 */
 
+#ifdef ARM_BOARD_CONFIG_MSM8916_HARPIA
+/*
+ * Qualcomm MSM8916 (Snapdragon 410) - Motorola Harpia (Moto G4 Play)
+ * ARM32 mode - Cortex-A7 cores
+ */
+#define ARMA7
+#define ARM_ARCH_TIMER
+#include <pexpert/arm/MSM8916_HARPIA.h>
+#define ARM_BOARD_WFE_TIMEOUT_NS 10000
+#define __ARM_L2CACHE_SIZE_LOG__ 19
+#define ARM_BOARD_CLASS_MSM8916_HARPIA
+#define CPU_COUNT 4
+#define CORE_NCTRS 4
+#define NO_MONITOR 1
+#define NO_ECORE 1
+#endif  /* ARM_BOARD_CONFIG_MSM8916_HARPIA */
+
 #endif /* ! _PEXPERT_ARM_BOARD_CONFIG_H */
