@@ -1,0 +1,238 @@
+[
+  {
+    "name": "device-tree",
+    "compatible": "motorola,harpia",
+    "model": "Motorola Moto G4 Play (harpia)",
+    "#address-cells": 2,
+    "#size-cells": 2,
+    "#interrupt-cells": 1,
+
+    "children": [
+      {
+        "name": "chosen",
+        "firmware-version": "lk2nd-22.0",
+        "debug-enabled": { "type": "empty" },
+
+        "children": [
+          {
+            "name": "memory-map",
+            "BootCLUT": { "type": "empty" },
+            "DeviceTree": { "type": "empty" }
+          }
+        ]
+      },
+
+      {
+        "name": "memory",
+        "device_type": "memory",
+        "reg": [[1610612736, 1073741824]]
+      },
+
+      {
+        "name": "cpus",
+        "#address-cells": 1,
+        "#size-cells": 0,
+
+        "children": [
+          {
+            "name": "cpu@0",
+            "device_type": "cpu",
+            "compatible": "arm,cortex-a53",
+            "reg": [0],
+            "clock-frequency": {"type": "cells", "value": [998400000]},
+            "enable-method": "psci"
+          },
+          {
+            "name": "cpu@1",
+            "device_type": "cpu",
+            "compatible": "arm,cortex-a53",
+            "reg": [1],
+            "clock-frequency": {"type": "cells", "value": [998400000]},
+            "enable-method": "psci"
+          },
+          {
+            "name": "cpu@2",
+            "device_type": "cpu",
+            "compatible": "arm,cortex-a53",
+            "reg": [2],
+            "clock-frequency": {"type": "cells", "value": [998400000]},
+            "enable-method": "psci"
+          },
+          {
+            "name": "cpu@3",
+            "device_type": "cpu",
+            "compatible": "arm,cortex-a53",
+            "reg": [3],
+            "clock-frequency": {"type": "cells", "value": [998400000]},
+            "enable-method": "psci"
+          }
+        ]
+      },
+
+      {
+        "name": "gic",
+        "compatible": "arm,cortex-a15-gic",
+        "device_type": "interrupt-controller",
+        "interrupt-controller": { "type": "empty" },
+        "#interrupt-cells": 3,
+        "AAPL,phandle": {"type": "phandle", "value": 1},
+        "reg": [[184549376, 4096, 184557568, 4096]]
+      },
+
+      {
+        "name": "timer",
+        "compatible": "arm,armv7-timer",
+        "interrupt-parent": {"type": "phandle", "value": 1},
+        "interrupts": [17, 4, 160, 19, 4, 160, 18, 4, 160, 20, 4, 160]
+      },
+
+      {
+        "name": "soc",
+        "compatible": "simple-bus",
+        "device_type": "simple-bus",
+        "#address-cells": 2,
+        "#size-cells": 2,
+        "ranges": { "type": "empty" },
+
+        "children": [
+          {
+            "name": "serial@78af000",
+            "compatible": "qcom,msm-uartdm-v1.4",
+            "device_type": "serial",
+            "reg": [[126607360, 512]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [139, 1, 160],
+            "clock-frequency": {"type": "cells", "value": [19200000]}
+          },
+          {
+            "name": "serial@78b0000",
+            "compatible": "qcom,msm-uartdm-v1.4",
+            "device_type": "serial",
+            "reg": [[126611456, 512]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [140, 1, 160],
+            "clock-frequency": {"type": "cells", "value": [19200000]}
+          },
+          {
+            "name": "sdhc@7824000",
+            "compatible": "qcom,sdhci-msm-v4",
+            "device_type": "sdhc",
+            "reg": [[125984768, 2048]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [155, 1, 160]
+          },
+          {
+            "name": "sdhc@7864000",
+            "compatible": "qcom,sdhci-msm-v4",
+            "device_type": "sdhc",
+            "reg": [[126246912, 2048]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [157, 1, 160]
+          },
+          {
+            "name": "i2c@78b5000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126631936, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [137, 1, 160]
+          },
+          {
+            "name": "i2c@78b6000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126636032, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [138, 1, 160]
+          },
+          {
+            "name": "i2c@78b8000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126644224, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [135, 1, 160]
+          },
+          {
+            "name": "i2c@78b9000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126648320, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [136, 1, 160]
+          },
+          {
+            "name": "i2c@78a2000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126500864, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [131, 1, 160]
+          },
+          {
+            "name": "i2c@78a4000",
+            "compatible": "qcom,i2c-qup",
+            "device_type": "i2c",
+            "reg": [[126509056, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [133, 1, 160]
+          },
+          {
+            "name": "watchdog@fd4b3000",
+            "compatible": "qcom,msm-watchdog",
+            "reg": [[264570880, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [75, 1, 160]
+          },
+          {
+            "name": "timer@fd8c3000",
+            "compatible": "qcom,msm-timer",
+            "reg": [[264996864, 4096]],
+            "interrupt-parent": {"type": "phandle", "value": 1},
+            "interrupts": [34, 1, 160]
+          }
+        ]
+      },
+
+      {
+        "name": "reserved-memory",
+        "#address-cells": 2,
+        "#size-cells": 2,
+        "ranges": { "type": "empty" },
+
+        "children": [
+          {
+            "name": "tz@86500000",
+            "reg": [[2253502464, 1572864]],
+            "no-map": { "type": "empty" }
+          },
+          {
+            "name": "smem@86300000",
+            "reg": [[2251405312, 1048576]],
+            "no-map": { "type": "empty" }
+          },
+          {
+            "name": "hypervisor@86400000",
+            "reg": [[2252453888, 1048576]],
+            "no-map": { "type": "empty" }
+          },
+          {
+            "name": "mpss@86800000",
+            "reg": [[2256648192, 45088768]],
+            "no-map": { "type": "empty" }
+          },
+          {
+            "name": "wcnss@89300000",
+            "reg": [[2301468672, 6291456]],
+            "no-map": { "type": "empty" }
+          },
+          {
+            "name": "venus@89900000",
+            "reg": [[2307760128, 6291456]],
+            "no-map": { "type": "empty" }
+          }
+        ]
+      }
+    ]
+  }
+]
