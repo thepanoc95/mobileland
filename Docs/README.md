@@ -8,4 +8,5 @@ MobileLand(OS) is an open source OS project that aims to provide a similar exper
 ### Join us!
 
 * Can you help build the dream? See the current projects/needs in [CONTRIBUTING.md](CONTRIBUTING.md)!
-* Our [Discord](https://discord.com/invite/8caJbAGNwY) server.
+* Our [Discord](https://discord.gg/STbzd7jChx) server.
+* Also checkout the ravynOS [Discord Server](https://discord.com/invite/8caJbAGNwY)!
