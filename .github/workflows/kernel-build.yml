@@ -62,29 +62,29 @@ jobs:
 
       - name: Configure CMake
         run: |
-          echo "Configuring CMake for ${{{{ matrix.target.name }}}}..."
-          cmake -S . -B build-${{{{ matrix.target.name }}} -GNinja \
+          echo "Configuring CMake for ${{ matrix.target.name }}..."
+          cmake -S . -B build-${{ matrix.target.name }} -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DTARGET_ARCH=${{{{ matrix.target.arch }}} \
-            -DTARGET_PLATFORM=${{{{ matrix.target.platform }}} \
-            -DARM_VERSION=${{{{ matrix.target.arm_version }}}
+            -DTARGET_ARCH=${{ matrix.target.arch }} \
+            -DTARGET_PLATFORM=${{ matrix.target.platform }} \
+            -DARM_VERSION=${{ matrix.target.arm_version }}
 
       - name: Build Kernel
         run: |
-          echo "Building XNU for ${{{{ matrix.target.name }}}}..."
-          cmake --build build-${{{{ matrix.target.name }}} -j$(nproc) 2>&1 | tee build-${{{{ matrix.target.name }}}.log
+          echo "Building XNU for ${{ matrix.target.name }}..."
+          cmake --build build-${{ matrix.target.name }} -j$(nproc) 2>&1 | tee build-${{ matrix.target.name }}.log
 
       - name: Collect artifacts
         run: |
-          mkdir -p artifacts/${{{{ matrix.target.name }}}
-          find build-${{{{ matrix.target.name }}} -name "mach_kernel*" -type f 2>/dev/null | head -5
-          [ -f "build-${{{{ matrix.target.name }}}.log" ] && cp "build-${{{{ matrix.target.name }}}.log" "artifacts/${{{{ matrix.target.name }}}/" || true
+          mkdir -p artifacts/${{ matrix.target.name }}
+          find build-${{ matrix.target.name }} -name "mach_kernel*" -type f 2>/dev/null | head -5
+          [ -f "build-${{ matrix.target.name }}.log" ] && cp "build-${{ matrix.target.name }}.log" "artifacts/${{ matrix.target.name }}/" || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xnu-kernel-${{{{ matrix.target.name }}}
-          path: artifacts/${{{{ matrix.target.name }}}/
+          name: xnu-kernel-${{ matrix.target.name }}
+          path: artifacts/${{ matrix.target.name }}/
           retention-days: 14
 
   build-all:
