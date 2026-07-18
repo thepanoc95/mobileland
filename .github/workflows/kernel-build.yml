@@ -51,7 +51,7 @@ jobs:
         run: |
           pacman -Sy --noconfirm
           pacman -S --noconfirm --needed \
-            base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
+            base-devel bmake cmake ninja pkg-config flex bison pax-utils cpio zstd \
             texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
             python clang llvm lld libc++ libc++abi libbsd libxml2 \
             perl git curl sudo
@@ -81,7 +81,7 @@ jobs:
             ARCH_CONFIGS="ARM"
           fi
           
-          make KERNEL_CONFIGS="$PLATFORM_NAME" ARCH_CONFIGS="$ARCH_CONFIGS" \
+          bmake KERNEL_CONFIGS="$PLATFORM_NAME" ARCH_CONFIGS="$ARCH_CONFIGS" \
             DARWIN_VERSION="$DARWIN_VERSION" TARGET_OS="iPhoneOS" \
             IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" ARM_VERSION="$ARM_VERSION" \
             TARGET_ARCH="$TARGET_ARCH" CC="clang" CXX="clang++" LD="ld.lld" \
@@ -113,7 +113,7 @@ jobs:
         run: |
           pacman -Sy --noconfirm
           pacman -S --noconfirm --needed \
-            base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
+            base-devel bmake cmake ninja pkg-config flex bison pax-utils cpio zstd \
             texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
             python clang llvm lld libc++ libc++abi libbsd libxml2 \
             perl git curl sudo
@@ -126,7 +126,7 @@ jobs:
       - name: Build HARPIA ARM
         run: |
           mkdir -p obj/harpia-arm
-          make KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM" \
+          bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM" \
             DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
             ARM_VERSION="7" TARGET_ARCH="arm" CC="clang" CXX="clang++" LD="ld.lld" \
             ARCH_FLAGS="-target arm-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm.log || true
@@ -134,7 +134,7 @@ jobs:
       - name: Build HARPIA ARM64
         run: |
           mkdir -p obj/harpia-arm64
-          make KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM64" \
+          bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM64" \
             DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
             ARM_VERSION="11" TARGET_ARCH="arm64" CC="clang" CXX="clang++" LD="ld.lld" \
             ARCH_FLAGS="-target arm64-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm64.log || true
