@@ -14,7 +14,7 @@
       ravynOS = {
         darwinVersion = "19.6.0";
         sdkVersion = "10.15.6";
-        deploymentTarget = "15.0";
+        deploymentTarget = "13.6.1";
       };
 
       # ravynOS SDK and toolchain from repository
