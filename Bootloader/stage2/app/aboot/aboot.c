@@ -96,6 +96,12 @@
 #include <display_menu.h>
 #include "fastboot_test.h"
 
+/* Boot from raw ELF support */
+#ifdef ENABLE_ELF_BOOT
+#include "boot_sys.h"
+#include "elf_boot.h"
+#endif
+
 #if WITH_LK2ND
 #include <lk2nd/init.h>
 #endif
@@ -5775,6 +5781,92 @@ static int aboot_save_boot_hash_mmc(uint32_t image_addr, uint32_t image_size)
 
 	return 0;
 }
+
+#ifdef ENABLE_ELF_BOOT
+/*
+ * Boot from /boot partition using BOOT.SYS configuration
+ * 
+ * This function attempts to read BOOT.SYS from the specified partition
+ * and boot a raw ELF kernel from the filesystem.
+ *
+ * @param partition - Partition name to search (NULL = "boot")
+ * @return int - 0 on success, negative on error
+ */
+int boot_linux_from_boot_partition(const char *partition)
+{
+	struct boot_sys_options opts;
+	struct boot_sys_fb_info fb_info;
+	int ret;
+
+	dprintf(INFO, "boot_sys: Attempting boot from /boot partition\n");
+
+	/* Initialize boot_sys */
+	boot_sys_init();
+
+	/* Set up options */
+	memset(&opts, 0, sizeof(opts));
+	opts.keep_fb = true;   /* Keep framebuffer active */
+	opts.verbose = true;   /* Verbose output */
+	opts.use_tags = true;  /* Use ATAGS/DTB */
+
+	/* Get framebuffer info */
+	if (boot_sys_get_fb_info(&fb_info) == 0) {
+		dprintf(INFO, "boot_sys: Framebuffer: %dx%d base=0x%llx\n",
+			fb_info.width, fb_info.height, fb_info.base);
+	}
+
+	/* Boot from partition */
+	ret = boot_sys_boot_from_partition(partition, &opts, &fb_info);
+	if (ret != BOOT_SYS_OK) {
+		dprintf(CRITICAL, "boot_sys: Boot failed: %d\n", ret);
+		return ret;
+	}
+
+	/* Should not return if boot succeeded */
+	return 0;
+}
+
+/*
+ * Boot ELF from raw file path
+ *
+ * @param elf_path - Path to ELF file on partition
+ * @param cmdline - Kernel command line (NULL to use empty)
+ * @return int - 0 on success, negative on error
+ */
+int boot_elf_file(const char *elf_path, const char *cmdline)
+{
+	struct boot_sys_options opts;
+	struct boot_sys_fb_info fb_info;
+	int ret;
+
+	if (!elf_path)
+		return -1;
+
+	if (!cmdline)
+		cmdline = "";
+
+	dprintf(INFO, "boot_elf: Loading ELF: %s\n", elf_path);
+	dprintf(INFO, "boot_elf: Cmdline: %s\n", cmdline);
+
+	/* Initialize */
+	boot_sys_init();
+
+	/* Set up options */
+	memset(&opts, 0, sizeof(opts));
+	opts.keep_fb = true;
+	opts.verbose = true;
+	opts.use_tags = true;
+
+	/* Boot ELF */
+	ret = boot_sys_boot_elf(elf_path, cmdline, &opts, &fb_info);
+	if (ret != BOOT_SYS_OK) {
+		dprintf(CRITICAL, "boot_elf: Boot failed: %d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+#endif /* ENABLE_ELF_BOOT */
 
 
 APP_START(aboot)

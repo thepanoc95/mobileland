@@ -34,3 +34,11 @@ OBJS += \
 	$(LOCAL_DIR)/mdtp_defs.o \
 	$(LOCAL_DIR)/mdtp_fs.o
 endif
+
+# ELF boot support for raw kernels from /boot partition
+ifeq ($(ENABLE_ELF_BOOT),1)
+OBJS += \
+	$(LOCAL_DIR)/elf_boot.o \
+	$(LOCAL_DIR)/boot_sys.o
+DEFINES += ENABLE_ELF_BOOT=1
+endif
