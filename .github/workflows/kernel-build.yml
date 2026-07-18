@@ -1,0 +1,155 @@
+name: Build XNU Kernel for Harpia
+
+on:
+  push:
+    branches: [ darwin, main ]
+    paths:
+      - 'Kernel/**'
+      - 'Libraries/**'
+      - 'Frameworks/**'
+      - 'Makefile'
+      - '.github/workflows/kernel-build.yml'
+  pull_request:
+    branches: [ darwin, main ]
+    paths:
+      - 'Kernel/**'
+      - 'Libraries/**'
+      - 'Frameworks/**'
+      - 'Makefile'
+      - '.github/workflows/kernel-build.yml'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Build target'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - harpia-arm
+          - harpia-arm64
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - { name: harpia-arm, arch: arm, platform: Harpia }
+          - { name: harpia-arm64, arch: arm64, platform: Harpia }
+
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed \
+            base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
+            texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
+            python python-plist clang llvm lld libc++ libc++abi libbsd libxml2 \
+            perl git curl sudo
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build Kernel
+        run: |
+          echo 'Building XNU for ${{ matrix.target.name }}...'
+          mkdir -p obj/${{ matrix.target.name }}
+          
+          DARWIN_VERSION="19.6.0"
+          IPHONEOS_DEPLOYMENT_TARGET="15.0"
+          PLATFORM_NAME="${{ matrix.target.platform }}"
+          TARGET_ARCH="${{ matrix.target.arch }}"
+          
+          if [ "$TARGET_ARCH" = "arm64" ]; then
+            ARM_VERSION="11"
+            ARCH_FLAGS="-target arm64-apple-ios${IPHONEOS_DEPLOYMENT_TARGET}"
+            ARCH_CONFIGS="ARM64"
+          else
+            ARM_VERSION="7"
+            ARCH_FLAGS="-target arm-apple-ios${IPHONEOS_DEPLOYMENT_TARGET}"
+            ARCH_CONFIGS="ARM"
+          fi
+          
+          make KERNEL_CONFIGS="$PLATFORM_NAME" ARCH_CONFIGS="$ARCH_CONFIGS" \
+            DARWIN_VERSION="$DARWIN_VERSION" TARGET_OS="iPhoneOS" \
+            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" ARM_VERSION="$ARM_VERSION" \
+            TARGET_ARCH="$TARGET_ARCH" CC="clang" CXX="clang++" LD="ld.lld" \
+            ARCH_FLAGS="$ARCH_FLAGS" -j$(nproc) 2>&1 | tee build-${{ matrix.target.name }}.log || exit 1
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts/${{ matrix.target.name }}
+          find . -name "mach_kernel*" -type f 2>/dev/null | head -5
+          [ -f "obj/${{ matrix.target.name }}/xnu/mach_kernel" ] && cp "obj/${{ matrix.target.name }}/xnu/mach_kernel" "artifacts/${{ matrix.target.name }}/" || true
+          [ -f "build-${{ matrix.target.name }}.log" ] && cp "build-${{ matrix.target.name }}.log" "artifacts/${{ matrix.target.name }}/" || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xnu-kernel-${{ matrix.target.name }}
+          path: artifacts/${{ matrix.target.name }}/
+          retention-days: 14
+
+  build-all:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base
+      options: --privileged
+    if: github.event.inputs.target == 'all' || github.event.inputs.target == ''
+    
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed \
+            base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
+            texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
+            python python-plist clang llvm lld libc++ libc++abi libbsd libxml2 \
+            perl git curl sudo
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Build HARPIA ARM
+        run: |
+          mkdir -p obj/harpia-arm
+          make KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM" \
+            DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
+            ARM_VERSION="7" TARGET_ARCH="arm" CC="clang" CXX="clang++" LD="ld.lld" \
+            ARCH_FLAGS="-target arm-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm.log || true
+
+      - name: Build HARPIA ARM64
+        run: |
+          mkdir -p obj/harpia-arm64
+          make KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM64" \
+            DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
+            ARM_VERSION="11" TARGET_ARCH="arm64" CC="clang" CXX="clang++" LD="ld.lld" \
+            ARCH_FLAGS="-target arm64-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm64.log || true
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts/harpia-arm artifacts/harpia-arm64
+          [ -f "obj/harpia-arm/xnu/mach_kernel" ] && cp "obj/harpia-arm/xnu/mach_kernel" "artifacts/harpia-arm/" || true
+          [ -f "build-harpia-arm.log" ] && cp "build-harpia-arm.log" "artifacts/harpia-arm/" || true
+          [ -f "obj/harpia-arm64/xnu/mach_kernel" ] && cp "obj/harpia-arm64/xnu/mach_kernel" "artifacts/harpia-arm64/" || true
+          [ -f "build-harpia-arm64.log" ] && cp "build-harpia-arm64.log" "artifacts/harpia-arm64/" || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xnu-kernel-harpia-all
+          path: artifacts/
+          retention-days: 14
