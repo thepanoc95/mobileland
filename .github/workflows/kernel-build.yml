@@ -81,6 +81,10 @@ jobs:
             ARCH_CONFIGS="ARM"
           fi
           
+          # Skip rebuilding gmake toolchain (use prebuilt)
+          touch Developer/Default.xctoolchain/gmake/Makefile
+          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
+          
           bmake KERNEL_CONFIGS="$PLATFORM_NAME" ARCH_CONFIGS="$ARCH_CONFIGS" \
             DARWIN_VERSION="$DARWIN_VERSION" TARGET_OS="iPhoneOS" \
             IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" ARM_VERSION="$ARM_VERSION" \
@@ -126,6 +130,9 @@ jobs:
       - name: Build HARPIA ARM
         run: |
           mkdir -p obj/harpia-arm
+          # Skip rebuilding gmake toolchain (use prebuilt)
+          touch Developer/Default.xctoolchain/gmake/Makefile
+          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
           bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM" \
             DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
             ARM_VERSION="7" TARGET_ARCH="arm" CC="clang" CXX="clang++" LD="ld.lld" \
@@ -134,6 +141,9 @@ jobs:
       - name: Build HARPIA ARM64
         run: |
           mkdir -p obj/harpia-arm64
+          # Skip rebuilding gmake toolchain (use prebuilt)
+          touch Developer/Default.xctoolchain/gmake/Makefile
+          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
           bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM64" \
             DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
             ARM_VERSION="11" TARGET_ARCH="arm64" CC="clang" CXX="clang++" LD="ld.lld" \
