@@ -53,7 +53,7 @@ jobs:
             cmake ninja-build clang lld llvm \
             bison flex libpng-dev libxml2-dev zlib1g-dev \
             libssl-dev python3 cpio rsync tzdata \
-            gawk sed coreutils findutils diffutils grep gzip tar xz bzip2
+            gawk sed coreutils findutils diffutils grep gzip tar xz-utils bzip2
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -99,7 +99,7 @@ jobs:
             cmake ninja-build clang lld llvm \
             bison flex libpng-dev libxml2-dev zlib1g-dev \
             libssl-dev python3 cpio rsync tzdata \
-            gawk sed coreutils findutils diffutils grep gzip tar xz bzip2
+            gawk sed coreutils findutils diffutils grep gzip tar xz-utils bzip2
 
       - name: Checkout repository
         uses: actions/checkout@v4
