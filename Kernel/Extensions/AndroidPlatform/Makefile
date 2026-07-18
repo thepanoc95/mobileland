@@ -14,7 +14,7 @@
 
 KEXT_NAME := AndroidPlatform
 KEXT_ID := com.pocketdarwin.driver.AndroidPlatform
-KEXT_VERSION := 1.0.0
+KEXT_VERSION := 1.0.0[[[]]]
 
 # Device target (override with DEVICE=<device>)
 DEVICE ?= harpia64

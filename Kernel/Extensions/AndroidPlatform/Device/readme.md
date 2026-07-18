@@ -6,3 +6,6 @@ Supported devices:
 
 * harpia | Motorola Moto G4 Play
 * harpia64 | Motorola Moto G4 Play (ARM64 Mode)
+
+> [!NOTE]
+> Accepting PRs for new devices!
