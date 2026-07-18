@@ -53,7 +53,7 @@ jobs:
           pacman -S --noconfirm --needed \
             base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
             texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
-            python python-plist clang llvm lld libc++ libc++abi libbsd libxml2 \
+            python clang llvm lld libc++ libc++abi libbsd libxml2 \
             perl git curl sudo
 
       - name: Checkout repository
@@ -115,7 +115,7 @@ jobs:
           pacman -S --noconfirm --needed \
             base-devel cmake ninja pkg-config flex bison pax-utils cpio zstd \
             texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
-            python python-plist clang llvm lld libc++ libc++abi libbsd libxml2 \
+            python clang llvm lld libc++ libc++abi libbsd libxml2 \
             perl git curl sudo
 
       - name: Checkout repository
