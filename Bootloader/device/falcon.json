@@ -1,0 +1,108 @@
+{
+    "name": "device-tree",
+    "compatible": "motorola,falcon",
+    "model": "Motorola Moto G (falcon)",
+    "#address-cells": 2,
+    "#size-cells": 2,
+    "#interrupt-cells": 1,
+
+    "children": [
+        {
+            "name": "chosen",
+            "firmware-version": "lk2nd-22.0",
+
+            "children": [
+                {
+                    "name": "memory-map",
+                    "BootCLUT": { "type": "empty" },
+                    "DeviceTree": { "type": "empty" }
+                }
+            ]
+        },
+
+        {
+            "name": "memory",
+            "device_type": "memory",
+            "reg": [[0, 1073741824]]
+        },
+
+        {
+            "name": "cpus",
+            "#address-cells": 1,
+            "#size-cells": 0,
+
+            "children": [
+                {
+                    "name": "cpu@0",
+                    "device_type": "cpu",
+                    "compatible": "arm,cortex-a7",
+                    "reg": [0]
+                },
+                {
+                    "name": "cpu@1",
+                    "device_type": "cpu",
+                    "compatible": "arm,cortex-a7",
+                    "reg": [1]
+                },
+                {
+                    "name": "cpu@2",
+                    "device_type": "cpu",
+                    "compatible": "arm,cortex-a7",
+                    "reg": [2]
+                },
+                {
+                    "name": "cpu@3",
+                    "device_type": "cpu",
+                    "compatible": "arm,cortex-a7",
+                    "reg": [3]
+                }
+            ]
+        },
+
+        {
+            "name": "gic",
+            "compatible": "arm,cortex-a7-gic",
+            "device_type": "interrupt-controller",
+            "interrupt-controller": { "type": "empty" },
+            "#interrupt-cells": 3,
+            "AAPL,phandle": { "type": "phandle", "value": 1 },
+
+            "reg": [
+                [0xf9000000, 0x1000],
+                [0xf9002000, 0x2000]
+            ]
+        },
+
+        {
+            "name": "timer",
+            "compatible": "arm,armv7-timer",
+            "interrupt-parent": { "type": "phandle", "value": 1 }
+        },
+
+        {
+            "name": "soc",
+            "compatible": "simple-bus",
+            "device_type": "simple-bus",
+
+            "children": [
+                {
+                    "name": "serial@f991e000",
+                    "compatible": "qcom,msm-uartdm-v1.4",
+                    "device_type": "serial",
+                    "reg": [
+                        [0xf991e000, 0x1000]
+                    ]
+                },
+
+                {
+                    "name": "sdhc@f98a4000",
+                    "compatible": "qcom,sdhci-msm",
+                    "device_type": "sdhc",
+                    "reg": [
+                        [0xf98a4000, 0x1000]
+                    ]
+                }
+            ]
+        }
+    ]
+}
