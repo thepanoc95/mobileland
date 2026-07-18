@@ -7,7 +7,8 @@ on:
       - 'Kernel/**'
       - 'Libraries/**'
       - 'Frameworks/**'
-      - 'Makefile'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
       - '.github/workflows/kernel-build.yml'
   pull_request:
     branches: [ darwin, main ]
@@ -15,7 +16,8 @@ on:
       - 'Kernel/**'
       - 'Libraries/**'
       - 'Frameworks/**'
-      - 'Makefile'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
       - '.github/workflows/kernel-build.yml'
   workflow_dispatch:
     inputs:
@@ -35,92 +37,69 @@ permissions:
 
 jobs:
   build-kernel:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux:base
-      options: --privileged
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         target:
-          - { name: harpia-arm, arch: arm, platform: Harpia }
-          - { name: harpia-arm64, arch: arm64, platform: Harpia }
+          - { name: harpia-arm, arch: arm, platform: Harpia, arm_version: 7 }
+          - { name: harpia-arm64, arch: arm64, platform: Harpia, arm_version: 11 }
 
     steps:
       - name: Install dependencies
         run: |
-          pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed \
-            base-devel bmake cmake ninja pkg-config flex bison pax-utils cpio zstd \
-            texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
-            python clang llvm lld libc++ libc++abi libbsd libxml2 \
-            perl git curl sudo
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build clang lld llvm \
+            bison flex libpng-dev libxml2-dev zlib1g-dev \
+            libssl-dev python3 cpio rsync tzdata \
+            gawk sed coreutils findutils diffutils grep gzip tar xz bzip2
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: Configure CMake
+        run: |
+          echo "Configuring CMake for ${{{{ matrix.target.name }}}}..."
+          cmake -S . -B build-${{{{ matrix.target.name }}} -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DTARGET_ARCH=${{{{ matrix.target.arch }}} \
+            -DTARGET_PLATFORM=${{{{ matrix.target.platform }}} \
+            -DARM_VERSION=${{{{ matrix.target.arm_version }}}
+
       - name: Build Kernel
         run: |
-          echo 'Building XNU for ${{ matrix.target.name }}...'
-          mkdir -p obj/${{ matrix.target.name }}
-          
-          DARWIN_VERSION="19.6.0"
-          IPHONEOS_DEPLOYMENT_TARGET="15.0"
-          PLATFORM_NAME="${{ matrix.target.platform }}"
-          TARGET_ARCH="${{ matrix.target.arch }}"
-          
-          if [ "$TARGET_ARCH" = "arm64" ]; then
-            ARM_VERSION="11"
-            ARCH_FLAGS="-target arm64-apple-ios${IPHONEOS_DEPLOYMENT_TARGET}"
-            ARCH_CONFIGS="ARM64"
-          else
-            ARM_VERSION="7"
-            ARCH_FLAGS="-target arm-apple-ios${IPHONEOS_DEPLOYMENT_TARGET}"
-            ARCH_CONFIGS="ARM"
-          fi
-          
-          # Skip rebuilding gmake toolchain (use prebuilt)
-          touch Developer/Default.xctoolchain/gmake/Makefile
-          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
-          
-          bmake KERNEL_CONFIGS="$PLATFORM_NAME" ARCH_CONFIGS="$ARCH_CONFIGS" \
-            DARWIN_VERSION="$DARWIN_VERSION" TARGET_OS="iPhoneOS" \
-            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" ARM_VERSION="$ARM_VERSION" \
-            TARGET_ARCH="$TARGET_ARCH" CC="clang" CXX="clang++" LD="ld.lld" \
-            ARCH_FLAGS="$ARCH_FLAGS" -j$(nproc) 2>&1 | tee build-${{ matrix.target.name }}.log || exit 1
+          echo "Building XNU for ${{{{ matrix.target.name }}}}..."
+          cmake --build build-${{{{ matrix.target.name }}} -j$(nproc) 2>&1 | tee build-${{{{ matrix.target.name }}}.log
 
       - name: Collect artifacts
         run: |
-          mkdir -p artifacts/${{ matrix.target.name }}
-          find . -name "mach_kernel*" -type f 2>/dev/null | head -5
-          [ -f "obj/${{ matrix.target.name }}/xnu/mach_kernel" ] && cp "obj/${{ matrix.target.name }}/xnu/mach_kernel" "artifacts/${{ matrix.target.name }}/" || true
-          [ -f "build-${{ matrix.target.name }}.log" ] && cp "build-${{ matrix.target.name }}.log" "artifacts/${{ matrix.target.name }}/" || true
+          mkdir -p artifacts/${{{{ matrix.target.name }}}
+          find build-${{{{ matrix.target.name }}} -name "mach_kernel*" -type f 2>/dev/null | head -5
+          [ -f "build-${{{{ matrix.target.name }}}.log" ] && cp "build-${{{{ matrix.target.name }}}.log" "artifacts/${{{{ matrix.target.name }}}/" || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xnu-kernel-${{ matrix.target.name }}
-          path: artifacts/${{ matrix.target.name }}/
+          name: xnu-kernel-${{{{ matrix.target.name }}}
+          path: artifacts/${{{{ matrix.target.name }}}/
           retention-days: 14
 
   build-all:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux:base
-      options: --privileged
+    runs-on: ubuntu-22.04
     if: github.event.inputs.target == 'all' || github.event.inputs.target == ''
     
     steps:
       - name: Install dependencies
         run: |
-          pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed \
-            base-devel bmake cmake ninja pkg-config flex bison pax-utils cpio zstd \
-            texinfo gawk sed coreutils findutils diffutils grep gzip tar xz bzip2 \
-            python clang llvm lld libc++ libc++abi libbsd libxml2 \
-            perl git curl sudo
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build clang lld llvm \
+            bison flex libpng-dev libxml2-dev zlib1g-dev \
+            libssl-dev python3 cpio rsync tzdata \
+            gawk sed coreutils findutils diffutils grep gzip tar xz bzip2
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -129,35 +108,25 @@ jobs:
 
       - name: Build HARPIA ARM
         run: |
-          mkdir -p obj/harpia-arm
-          # Skip rebuilding gmake toolchain (use prebuilt)
-          touch Developer/Default.xctoolchain/gmake/Makefile
-          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
-          bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM" \
-            DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
-            ARM_VERSION="7" TARGET_ARCH="arm" CC="clang" CXX="clang++" LD="ld.lld" \
-            ARCH_FLAGS="-target arm-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm.log || true
+          cmake -S . -B build-harpia-arm -GNinja \
+            -DCMAKE_BUILD_TYPE=Release -DTARGET_ARCH=arm \
+            -DTARGET_PLATFORM=Harpia -DARM_VERSION=7
+          cmake --build build-harpia-arm -j$(nproc) 2>&1 | tee build-harpia-arm.log || true
 
       - name: Build HARPIA ARM64
         run: |
-          mkdir -p obj/harpia-arm64
-          # Skip rebuilding gmake toolchain (use prebuilt)
-          touch Developer/Default.xctoolchain/gmake/Makefile
-          touch Developer/Default.xctoolchain/gmake/lib/Makefile 2>/dev/null || true
-          bmake KERNEL_CONFIGS="Harpia" ARCH_CONFIGS="ARM64" \
-            DARWIN_VERSION="19.6.0" TARGET_OS="iPhoneOS" IPHONEOS_DEPLOYMENT_TARGET="15.0" \
-            ARM_VERSION="11" TARGET_ARCH="arm64" CC="clang" CXX="clang++" LD="ld.lld" \
-            ARCH_FLAGS="-target arm64-apple-ios15.0" -j$(nproc) 2>&1 | tee build-harpia-arm64.log || true
+          cmake -S . -B build-harpia-arm64 -GNinja \
+            -DCMAKE_BUILD_TYPE=Release -DTARGET_ARCH=arm64 \
+            -DTARGET_PLATFORM=Harpia -DARM_VERSION=11
+          cmake --build build-harpia-arm64 -j$(nproc) 2>&1 | tee build-harpia-arm64.log || true
 
       - name: Collect artifacts
         run: |
           mkdir -p artifacts/harpia-arm artifacts/harpia-arm64
-          [ -f "obj/harpia-arm/xnu/mach_kernel" ] && cp "obj/harpia-arm/xnu/mach_kernel" "artifacts/harpia-arm/" || true
           [ -f "build-harpia-arm.log" ] && cp "build-harpia-arm.log" "artifacts/harpia-arm/" || true
-          [ -f "obj/harpia-arm64/xnu/mach_kernel" ] && cp "obj/harpia-arm64/xnu/mach_kernel" "artifacts/harpia-arm64/" || true
           [ -f "build-harpia-arm64.log" ] && cp "build-harpia-arm64.log" "artifacts/harpia-arm64/" || true
 
-      - name: Upload artifacts
+      - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
           name: xnu-kernel-harpia-all
