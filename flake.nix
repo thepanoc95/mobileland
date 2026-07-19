@@ -1,5 +1,5 @@
 {
-  description = "ravynOS - XNU for ARM devices (Motorola Harpia/MSM8916)";
+  description = "none";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -10,7 +10,6 @@
     let
       forEachSystem = systems: f: nixpkgs.lib.genAttrs systems (system: f system);
 
-      # ravynOS version info
       ravynOS = {
         darwinVersion = "19.6.0";
         sdkVersion = "10.15.6";
@@ -27,13 +26,36 @@
           name = "ravynos-${name}";
 
           packages = with pkgs; [
-            gnumake cmake ninja pkg-config
-            clang_17 lld_17 llvm_17
-            targetPackages.stdenv.cc.bintools-wrapper
-            flex bison
-            python3 libplist libxml2 zlib libpng libssl
-            cpio rsync coreutils findutils diffutils grep gzip tar xz bzip2
-            gawk sed texinfo git curl wget jq bc libbsd
+            gnumake 
+            cmake 
+            ninja 
+            pkg-config
+            clang 
+            lld 
+            llvm
+            flex 
+            bison
+            python3 
+            libplist 
+            libxml2 
+            zlib 
+            libpng
+            cpio 
+            rsync 
+            coreutils 
+            findutils 
+            diffutils 
+            gzip 
+            xz 
+            bzip2
+            gawk 
+            texinfo 
+            git 
+            curl 
+            wget 
+            jq 
+            bc 
+            libbsd
           ];
 
           env = {
@@ -57,23 +79,28 @@
           };
 
           shellHook = ''
-            echo "=============================================="
-            echo "ravynOS Development Environment"
-            echo "Architecture: ${arch} (ARM${toString armVersion})"
-            echo "Target: $TARGET_OS $IPHONEOS_DEPLOYMENT_TARGET"
-            echo "SDK: $SDKROOT"
-            echo "=============================================="
             export PATH="${ravynToolchain}/usr/bin:$PATH"
           '';
         };
+        blBuildEnv = { pkgs, arch }:
+          pkgs.mkShell {
+            packages = with pkgs; [
+              gnumake
+              gcc
+              clang
+              mkbootimg
+            ];
+          };
     in
     {
       packages = forEachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
         let pkgs = import nixpkgs { inherit system; };
         in {
-          default = self.packages.${system}.harpia-arm64;
-          harpia-arm = mkRavynOSEnv { inherit pkgs; name = "harpia-arm"; arch = "arm"; armVersion = 7; };
-          harpia-arm64 = mkRavynOSEnv { inherit pkgs; name = "harpia-arm64"; arch = "arm64"; armVersion = 11; };
+          default = mkRavynOSEnv { inherit pkgs; name = "default"; arch = "arm"; armVersion = 0; };
+          stage3 = blBuildEnv { inherit pkgs; arch = "arm"; };
+          stage3_arm64 = blBuildEnv { inherit pkgs; arch = "arm64"; };
+          harpia = mkRavynOSEnv { inherit pkgs; name = "harpia-arm"; arch = "arm"; armVersion = 7; };
+          harpia64 = mkRavynOSEnv { inherit pkgs; name = "harpia-arm64"; arch = "arm64"; armVersion = 11; };
           dev-x86_64 = mkRavynOSEnv { inherit pkgs; name = "dev-x86_64"; arch = "x86_64"; armVersion = 0; };
         }
       );

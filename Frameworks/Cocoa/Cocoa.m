@@ -9,7 +9,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // Original - Christopher Lloyd <cjwl@objc.net>
 #import <Cocoa/Cocoa.h>
 
+#define UIApplication NSApplication // (no one saw this....shhh!)
+
+/*
+// changes for UIKit by thepanoc95
+@implementation UIDefs
+   NSString UIApplication = NSApplication; // WARNING: this may not work lol
+@end
+*/
 static void Cocoa(){
    [NSObject class];
-   [NSApplication class];
+   [UIApplication class]; // NSApplication -> UIApplication
 }

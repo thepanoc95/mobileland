@@ -1,4 +1,0 @@
-! model		=	symbols
-  chromebook    =   +inet(evdev)+inet(chromebook)
-  ppkb          =   +inet(evdev)+inet(ppkb)
-  *             =   +inet(evdev)

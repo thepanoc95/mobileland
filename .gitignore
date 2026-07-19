@@ -6,3 +6,6 @@ ravynOS.xcodeproj
 /.vscode
 Toolchains/
 obj/
+flake.lock
+
+*.lock

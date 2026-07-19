@@ -1,0 +1,33 @@
+#ifndef _UIKIT_H
+    #define _UIKIT_H
+    #define __DEBUG__ 1 // Turn me off on releases pls. (I'm asking politely, so do it.)
+
+    #import "UIResponder.h"
+    #import "UIView.h"
+    #import "UIControl.h"
+    #import "UIApplication.h"
+    #import "UIWindow.h"
+    #import "UIScreen.h"
+    #import "UIViewController.h"
+    #import "UIColor.h"
+    #import "UIFont.h"
+    #import "UIImage.h"
+    #import "UIImageView.h"
+    #import "UIGraphics.h"
+    #import "UIEvent.h"
+    #import "UILabel.h"
+    #import "UIButton.h"
+    #import "UITextField.h"
+    #import "UIScrollView.h"
+    #import "UITableView.h"
+    #import "UITableViewCell.h"
+    #import "UINavigationBar.h"
+    #import "UINavigationController.h"
+    #import "UITabBar.h"
+    #import "UITabBarController.h"
+    #import "UIVisualEffect.h"
+    #import "UIBlurEffect.h"
+    #import "UIVibrancyEffect.h"
+    #import "UIVisualEffectView.h"
+    #import "UIMaterialView.h"
+#endif // _UIKIT_H
